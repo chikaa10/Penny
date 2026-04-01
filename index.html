@@ -880,20 +880,20 @@
 
     <div class="stats-bar">
       <div class="stat-item">
-        <div class="stat-number"><span>62%</span></div>
-        <div class="stat-label">faster for users to understand their monthly spending</div>
+        <div class="stat-number"><span>3</span></div>
+        <div class="stat-label">fully specced flows: onboarding, weekly review, anomaly alert</div>
       </div>
       <div class="stat-item">
-        <div class="stat-number"><span>4.4</span><span style="font-size:20px">/5</span></div>
-        <div class="stat-label">trust score for Penny's AI (from people who said they'd never trust AI with money)</div>
+        <div class="stat-number"><span>26</span></div>
+        <div class="stat-label">screens designed, each with default, loading, and edge case states</div>
       </div>
       <div class="stat-item">
-        <div class="stat-number"><span>100%</span></div>
-        <div class="stat-label">of testers finished their weekly review in under 90 seconds</div>
+        <div class="stat-number"><span>6</span></div>
+        <div class="stat-label">user interviews that shaped the AI trust principles</div>
       </div>
       <div class="stat-item">
-        <div class="stat-number"><span>0</span></div>
-        <div class="stat-label">people found the AI nudges annoying, pushy, or scary</div>
+        <div class="stat-number"><span>18</span></div>
+        <div class="stat-label">components built before a single screen was touched</div>
       </div>
     </div>
 
@@ -975,8 +975,8 @@
       <div class="process-step fade-up">
         <div class="step-num">6</div>
         <div>
-          <div class="step-title">Prototype & Usability Testing</div>
-          <div class="step-body">Built a click-through prototype and ran it past 5 people. Three things broke. I fixed them. The testing wasn't about proving the concept worked; it was about finding out where it didn't.</div>
+          <div class="step-title">High-Fidelity Prototype</div>
+          <div class="step-body">Building out the full prototype in Figma now, with micro-interactions specced in Protopie. The plan is to run moderated usability sessions once the core flows are wired — focusing on the weekly review and anomaly flows first.</div>
         </div>
       </div>
     </div>
@@ -1220,43 +1220,44 @@
   </div>
 </section>
 
-<!-- 07 OUTCOMES -->
+<!-- 07 DESIGN GOALS -->
 <section>
   <div class="container">
-    <div class="section-tag fade-up">07 Outcomes</div>
-    <h2 class="section-title fade-up">What the testing<br><em>actually showed.</em></h2>
+    <div class="section-tag fade-up">07 Design Goals</div>
+    <h2 class="section-title fade-up">What I'll test<br><em>when the prototype is ready.</em></h2>
+    <p class="section-body fade-up">I defined success criteria before designing a single screen. These are the questions I'll answer in usability testing — specific enough to give clear signal, honest enough to tell me when something isn't working.</p>
 
     <div class="outcomes-grid">
       <div class="outcome-card fade-up">
-        <div class="outcome-number">62%</div>
-        <div class="outcome-label">faster for people to understand their monthly spending<br><span style="font-size:12px; color: var(--text-dim)">usability test, n=5</span></div>
+        <div class="outcome-number" style="font-size: 32px; padding-top: 8px;">⏱</div>
+        <div class="outcome-label" style="margin-top: 12px;"><strong style="color: var(--text-primary); display: block; margin-bottom: 6px; font-size: 15px;">Clarity speed</strong>Can someone answer "am I okay this month?" in under 2 minutes, without any help from me?</div>
       </div>
       <div class="outcome-card fade-up">
-        <div class="outcome-number">4.4/5</div>
-        <div class="outcome-label">trust score for Penny's AI, from people who started skeptical<br><span style="font-size:12px; color: var(--text-dim)">post-prototype survey</span></div>
+        <div class="outcome-number" style="font-size: 32px; padding-top: 8px;">🤝</div>
+        <div class="outcome-label" style="margin-top: 12px;"><strong style="color: var(--text-primary); display: block; margin-bottom: 6px; font-size: 15px;">Trust signal</strong>Do people trust the AI insight enough to act on it, or do they dismiss it without reading?</div>
       </div>
       <div class="outcome-card fade-up">
-        <div class="outcome-number">100%</div>
-        <div class="outcome-label">finished the weekly review in under 90 seconds<br><span style="font-size:12px; color: var(--text-dim)">all 5 testers</span></div>
+        <div class="outcome-number" style="font-size: 32px; padding-top: 8px;">📅</div>
+        <div class="outcome-label" style="margin-top: 12px;"><strong style="color: var(--text-primary); display: block; margin-bottom: 6px; font-size: 15px;">Review completion</strong>Does the weekly review feel like 90 seconds or like homework? Would they open it again next Sunday?</div>
       </div>
       <div class="outcome-card fade-up">
-        <div class="outcome-number">0</div>
-        <div class="outcome-label">people used the words "pushy," "annoying," or "scary" about Penny<br><span style="font-size:12px; color: var(--text-dim)">the metric I cared most about</span></div>
+        <div class="outcome-number" style="font-size: 32px; padding-top: 8px;">🔔</div>
+        <div class="outcome-label" style="margin-top: 12px;"><strong style="color: var(--text-primary); display: block; margin-bottom: 6px; font-size: 15px;">Tone of the anomaly</strong>Does the spend alert feel like a heads-up from a friend, or an accusation from a bank?</div>
       </div>
     </div>
 
     <div class="learnings-two-col">
       <div class="learning-block fade-up">
-        <h4>If I had another month</h4>
+        <h4>What's next for this project</h4>
         <ul class="learning-list">
-          <li>Android version, because the trust patterns I found probably look different on Material You</li>
-          <li>A/B test: one sentence of text vs. a mini sparkline for anomaly cards</li>
-          <li>Design for the stressful moments (job loss, unexpected bills), not just steady-state users</li>
-          <li>Run a full VoiceOver walkthrough with a blind tester. The accessibility annotations are there, but they haven't been tested with a real user yet</li>
+          <li>Finish the Figma prototype across all 3 flows</li>
+          <li>Run moderated usability sessions against these 4 questions</li>
+          <li>A/B test: one sentence of plain text vs. a mini sparkline for anomaly cards</li>
+          <li>Full VoiceOver walkthrough — the accessibility specs are written, but need real-user validation</li>
         </ul>
       </div>
       <div class="learning-block fade-up">
-        <h4>What I'd take to any fintech team</h4>
+        <h4>What I'd bring to any fintech team</h4>
         <ul class="learning-list">
           <li>Design the trust layer before the feature layer. Every time.</li>
           <li>Mobile interaction design is physics, not just pixels. Get the spring curves right.</li>
@@ -1277,11 +1278,6 @@
     </div>
     <h2 class="cta-title fade-up">Want to see<br>where this is going?</h2>
     <p class="cta-body fade-up">The Figma file is being built out now. I'd love to walk through the flows live, talk through the decisions, or just have a conversation about designing AI that people actually trust.</p>
-    <div class="cta-links fade-up">
-      <a class="cta-btn primary" href="/cdn-cgi/l/email-protection#2d4c4a4c5f5a4c41034c435e4544464c1c1d146d4a404c4441034e4240">Get in touch →</a>
-      <a class="cta-btn ghost" href="https://www.linkedin.com/in/anshika-agarwall/" target="_blank">LinkedIn</a>
-      <a class="cta-btn ghost" href="https://anshika1009.framer.website/" target="_blank">Back to portfolio</a>
-    </div>
   </div>
 </section>
 
