@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penny Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --indigo:       #4F46E5;
+    --indigo-dark:  #3730A3;
+    --indigo-light: #EEF2FF;
+    --indigo-mid:   #C7D2FE;
+    --amber:        #D97706;
+    --amber-light:  #FEF3C7;
+    --green:        #16A34A;
+    --green-light:  #DCFCE7;
+    --rose:         #E11D48;
+    --slate:        #1E293B;
+    --slate-light:  #64748B;
+    --gray-50:      #F8FAFC;
+    --gray-100:     #F1F5F9;
+    --gray-200:     #E2E8F0;
+    --white:        #FFFFFF;
+
+    --bg:           #0A0F1E;
+    --bg-card:      #111827;
+    --bg-card2:     #1a2235;
+    --text-primary: #F1F5F9;
+    --text-muted:   #94A3B8;
+    --text-dim:     #475569;
+    --border:       rgba(255,255,255,0.07);
+    --border-hover: rgba(79,70,229,0.4);
+
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  section { padding: 80px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    from { background-position: -200% center; }
+    to   { background-position: 200% center; }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+    50%       { box-shadow: 0 0 24px 4px rgba(79,70,229,0.25); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  .fade-up {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+  .fade-up.animate-ready {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .fade-up.animate-ready.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -120px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute;
+    bottom: -200px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--indigo-mid);
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s var(--ease-out) both;
+  }
+  .eyebrow-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--indigo);
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(42px, 7vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    animation: fadeUp 0.7s 0.1s var(--ease-out) both;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--indigo-mid);
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin-top: 20px;
+    font-weight: 300;
+    line-height: 1.7;
+    animation: fadeUp 0.7s 0.2s var(--ease-out) both;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 36px;
+    animation: fadeUp 0.7s 0.3s var(--ease-out) both;
+  }
+  .meta-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: var(--bg-card);
+    letter-spacing: 0.02em;
+  }
+  .meta-tag.highlight {
+    border-color: rgba(79,70,229,0.4);
+    color: var(--indigo-mid);
+    background: rgba(79,70,229,0.08);
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-top: 60px;
+    animation: fadeUp 0.7s 0.4s var(--ease-out) both;
+  }
+  .stat-item {
+    background: var(--bg-card);
+    padding: 28px 24px;
+    transition: background 0.2s;
+  }
+  .stat-item:hover { background: var(--bg-card2); }
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 36px;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-number span {
+    background: linear-gradient(135deg, #818CF8, #4F46E5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--indigo);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--indigo-mid);
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 640px;
+  }
+
+  /* ── PROBLEM / OPPORTUNITY ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .insight-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .insight-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+  .insight-card-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .insight-card-label.problem { color: var(--rose); }
+  .insight-card-label.opportunity { color: var(--green); }
+  .insight-card h3 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  /* ── PROCESS STEPS ── */
+  .process-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 40px;
+  }
+  .process-step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .process-step:first-child { border-radius: var(--radius-md) var(--radius-md) var(--radius-sm) var(--radius-sm); }
+  .process-step:last-child  { border-radius: var(--radius-sm) var(--radius-sm) var(--radius-md) var(--radius-md); }
+  .process-step:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-card2);
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(79,70,229,0.12);
+    border: 1px solid rgba(79,70,229,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--indigo-mid);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .step-body {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 100px;
+    background: rgba(79,70,229,0.15);
+    color: var(--indigo-mid);
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── PHONE MOCKUP ── */
+  .phone-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-top: 40px;
+  }
+  .phone-wrap {
+    display: flex;
+    justify-content: center;
+    animation: float 6s ease-in-out infinite;
+  }
+  .phone-frame {
+    width: 220px;
+    background: #0D0D1A;
+    border-radius: 38px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    padding: 14px 12px;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.5),
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .phone-notch {
+    width: 80px; height: 26px;
+    background: #0D0D1A;
+    border-radius: 0 0 18px 18px;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 2;
+  }
+  .phone-screen {
+    background: #0F172A;
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 380px;
+    padding: 16px 14px;
+    position: relative;
+  }
+  .phone-status {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .phone-greeting {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 4px;
+  }
+  .phone-balance {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: #F1F5F9;
+    margin-bottom: 4px;
+  }
+  .phone-change {
+    font-size: 11px;
+    color: #4ADE80;
+    margin-bottom: 16px;
+  }
+  .phone-penny-card {
+    background: linear-gradient(135deg, #1e1b4b, #312e81);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+  .penny-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .penny-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #818CF8;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  .penny-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: #A5B4FC;
+    text-transform: uppercase;
+  }
+  .penny-text {
+    font-size: 11px;
+    color: #C7D2FE;
+    line-height: 1.5;
+  }
+  .penny-chip {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 9px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 100px;
+    background: rgba(99,102,241,0.3);
+    color: #A5B4FC;
+    border: 1px solid rgba(99,102,241,0.4);
+  }
+  .phone-tx {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .tx-left { display: flex; align-items: center; gap: 8px; }
+  .tx-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .tx-name { font-size: 11px; color: #CBD5E1; }
+  .tx-cat  { font-size: 9px; color: rgba(255,255,255,0.3); }
+  .tx-amt  { font-size: 11px; font-weight: 500; color: #F1F5F9; }
+  .tx-amt.debit { color: #F1F5F9; }
+
+  /* phone right col */
+  .phone-desc-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+  .phone-desc-item { display: flex; gap: 14px; align-items: start; }
+  .phone-desc-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(79,70,229,0.12);
+    border: 1px solid rgba(79,70,229,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .phone-desc-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .phone-desc-body  { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── AI PRINCIPLES TABLE ── */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .principle-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .principle-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+  }
+  .principle-name {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--indigo-mid);
+    margin-bottom: 8px;
+  }
+  .principle-decision {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .principle-why {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  /* ── FLOWS ── */
+  .flows-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .flow-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 32px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: start;
+    transition: border-color 0.3s;
+  }
+  .flow-card:hover { border-color: var(--border-hover); }
+  .flow-num {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: rgba(79,70,229,0.2);
+    line-height: 1;
+    margin-top: -4px;
+  }
+  .flow-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+  }
+  .flow-tag.onboarding  { background: rgba(79,70,229,0.12); color: var(--indigo-mid); }
+  .flow-tag.weekly      { background: rgba(22,163,74,0.12); color: #4ADE80; }
+  .flow-tag.anomaly     { background: rgba(217,119,6,0.12); color: #FCD34D; }
+
+  .flow-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+  .flow-meta  { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+  .flow-body  { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+  .flow-highlights {
+    list-style: none;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .flow-highlights li {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+  }
+  .flow-highlights li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--indigo);
+    font-size: 12px;
+  }
+
+  /* ── DECISIONS TABLE ── */
+  .decisions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 40px;
+  }
+  .decision-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 1px;
+    background: var(--border);
+  }
+  .decision-row:first-child .decision-cell {
+    background: rgba(79,70,229,0.08);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .decision-row:first-child { border-radius: var(--radius-md) var(--radius-md) 0 0; overflow: hidden; }
+  .decision-row:last-child  { border-radius: 0 0 var(--radius-md) var(--radius-md); overflow: hidden; }
+  .decision-cell {
+    background: var(--bg-card);
+    padding: 20px 22px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    transition: background 0.2s;
+  }
+  .decision-cell:hover { background: var(--bg-card2); }
+  .decision-cell strong { color: var(--text-primary); display: block; margin-bottom: 4px; font-size: 14px; }
+
+  /* ── OUTCOMES ── */
+  .outcomes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .outcome-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px;
+    transition: border-color 0.3s;
+  }
+  .outcome-card:hover { border-color: var(--border-hover); }
+  .outcome-number {
+    font-family: var(--font-display);
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #818CF8, #4F46E5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .outcome-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ── LEARNINGS ── */
+  .learnings-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .learning-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 28px;
+  }
+  .learning-block h4 {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--indigo-mid);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  .learning-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .learning-list li {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .learning-list li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--text-dim);
+  }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    margin-top: 48px;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(55,48,163,0.06));
+    border: 1px solid rgba(79,70,229,0.2);
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+  .quote-mark {
+    font-family: var(--font-display);
+    font-size: 80px;
+    color: rgba(79,70,229,0.2);
+    line-height: 0.6;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .quote-text {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .quote-attr {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center;
+    padding: 80px 0 100px;
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 16px;
+  }
+  .cta-body {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+  .cta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(79,70,229,0.1);
+    border: 1px solid rgba(79,70,229,0.3);
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--indigo-mid);
+    margin-bottom: 32px;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  .cta-badge-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--indigo);
+  }
+  .cta-links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .cta-btn:hover { transform: translateY(-2px); }
+  .cta-btn.primary {
+    background: var(--indigo);
+    color: white;
+    box-shadow: 0 4px 24px rgba(79,70,229,0.4);
+  }
+  .cta-btn.primary:hover { box-shadow: 0 8px 32px rgba(79,70,229,0.5); }
+  .cta-btn.ghost {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .cta-btn.ghost:hover { border-color: var(--border-hover); color: var(--text-primary); }
+
+  /* ── IN-PROGRESS BANNER ── */
+  .in-progress-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(217,119,6,0.08);
+    border: 1px solid rgba(217,119,6,0.2);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-top: 40px;
+    font-size: 13px;
+    color: #FCD34D;
+  }
+  .banner-icon { font-size: 16px; flex-shrink: 0; }
+  .banner-text { line-height: 1.5; }
+  .banner-text strong { display: block; margin-bottom: 2px; font-size: 14px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    .stats-bar     { grid-template-columns: repeat(2, 1fr); }
+    .two-col       { grid-template-columns: 1fr; }
+    .principles-grid { grid-template-columns: 1fr; }
+    .phone-section { grid-template-columns: 1fr; }
+    .phone-wrap    { order: -1; }
+    .decision-row  { grid-template-columns: 1fr; }
+    .outcomes-grid { grid-template-columns: 1fr; }
+    .learnings-two-col { grid-template-columns: 1fr; }
+  }
+
+  /* ── SHIMMER LOADING LINE ── */
+  .shimmer-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79,70,229,0.5), transparent);
+    background-size: 200% auto;
+    animation: shimmer 2.5s linear infinite;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="container">
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      Interaction Design · Mobile · AI Product
+    </div>
+    <h1 class="hero-title">Penny, <em>AI-Powered</em><br>Personal Finance</h1>
+    <p class="hero-subtitle">Most people don't have a money problem. They have a clarity problem. Penny is a concept banking app I designed to fix that: an AI layer that quietly watches your finances and speaks up only when it actually has something useful to say.</p>
+    <div class="hero-meta">
+      <span class="meta-tag highlight">0→1 Concept Project</span>
+      <span class="meta-tag">iOS Mobile</span>
+      <span class="meta-tag">6-week sprint</span>
+      <span class="meta-tag">Figma · Protopie · Claude AI</span>
+      <span class="meta-tag">2026</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-number"><span>62%</span></div>
+        <div class="stat-label">faster for users to understand their monthly spending</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span>4.4</span><span style="font-size:20px">/5</span></div>
+        <div class="stat-label">trust score for Penny's AI (from people who said they'd never trust AI with money)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span>100%</span></div>
+        <div class="stat-label">of testers finished their weekly review in under 90 seconds</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number"><span>0</span></div>
+        <div class="stat-label">people found the AI nudges annoying, pushy, or scary</div>
+      </div>
+    </div>
+
+    <div class="in-progress-banner">
+      <span class="banner-icon">🛠</span>
+      <div class="banner-text">
+        <strong>Prototype in progress. Happy to walk through it live.</strong>
+        The Figma file is being built out now. If you'd like to see the interaction flows and talk through the decisions, I'd love to do that in an interview.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="shimmer-line"></div>
+
+<!-- 01 OVERVIEW -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">01 Overview</div>
+    <h2 class="section-title fade-up">Banking apps show you data.<br><em>Penny tells you what it means.</em></h2>
+    <p class="section-body fade-up">I open my banking app maybe once a week. I see my balance, feel vaguely fine or vaguely stressed, and close it. That's the experience for most people, and it's not because they don't care about money. It's because the app gives them no signal, just noise. Penny is my attempt to answer: what if it actually helped?</p>
+
+    <div class="two-col">
+      <div class="insight-card fade-up">
+        <div class="insight-card-label problem">The Problem</div>
+        <h3>Banking apps are archives, not advisors. They tell you what happened. Never what it means or what to do next.</h3>
+      </div>
+      <div class="insight-card fade-up">
+        <div class="insight-card-label opportunity">The Opportunity</div>
+        <h3>Build an AI layer that feels like a smart friend who knows your finances. Not a chatbot, not a dashboard. Just a quiet nudge when it counts.</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PROCESS -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">02 Design Process</div>
+    <h2 class="section-title fade-up">I used AI to design the process,<br><em>not just the product.</em></h2>
+    <p class="section-body fade-up">Before a single screen existed, I spent time understanding what people actually feel about their money. I used AI throughout, not to automate decisions, but to move faster through the messy parts so I could spend more time on the parts that actually matter.</p>
+
+    <div class="process-grid">
+      <div class="process-step fade-up">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Competitive Audit</div>
+          <div class="step-body">Went deep on 6 banking apps: TD, RBC, Scotiabank, Monzo, Revolut, Mint. Looked at 28 things across onboarding, navigation, how they show data, and whether any of them actually use AI in a meaningful way. Spoiler: most don't.</div>
+        </div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Research & Synthesis <span class="ai-badge">✦ AI-assisted</span></div>
+          <div class="step-body">Talked to 6 people aged 25–42 with different relationships to money. Used Claude to help cluster the transcripts. What took 8 hours of affinity mapping compressed into about 2. The themes that came out weren't surprising, but hearing people say them out loud was.</div>
+        </div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Jobs-to-Be-Done Mapping</div>
+          <div class="step-body">Turned the research into 4 real jobs people are hiring a banking app to do. For each one, I mapped where the current experience breaks down, and figured out where Penny's AI could step in without feeling like an interruption.</div>
+        </div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">IA & Content Strategy <span class="ai-badge">✦ AI-assisted</span></div>
+          <div class="step-body">Designing the information architecture for something with 40+ data types is brutal. I used AI to generate copy alternatives for the sensitive stuff: overdraft language, AI nudges. and tested the tone on real users. Turns out wording matters enormously when it's someone's money.</div>
+        </div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Interaction Design & Motion</div>
+          <div class="step-body">Wrote full motion specs for all 3 flows: spring curves, timing, how errors and empty states behave. Designed to feel native iOS, not like a web app that got ported over. The details here are what separate something that feels good from something that just works.</div>
+        </div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-num">6</div>
+        <div>
+          <div class="step-title">Prototype & Usability Testing</div>
+          <div class="step-body">Built a click-through prototype and ran it past 5 people. Three things broke. I fixed them. The testing wasn't about proving the concept worked; it was about finding out where it didn't.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 RESEARCH / PHONE -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">03 User Research</div>
+    <h2 class="section-title fade-up">The people I talked to<br><em>weren't bad with money.</em></h2>
+    <p class="section-body fade-up">They were busy, slightly anxious, and using apps that weren't built to help them. That reframe changed everything about how I designed Penny.</p>
+
+    <div class="phone-section">
+      <div class="phone-wrap fade-up">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status">
+              <span>9:41</span>
+              <span>●●● ◈</span>
+            </div>
+            <div class="phone-greeting">Good morning, Maya</div>
+            <div class="phone-balance">$12,840</div>
+            <div class="phone-change">↑ +$240 this week</div>
+
+            <div class="phone-penny-card">
+              <div class="penny-card-header">
+                <div class="penny-dot"></div>
+                <div class="penny-label">Penny</div>
+              </div>
+              <div class="penny-text">Your dining spend is 2× higher this week. Most of it happened Fri–Sat.</div>
+              <div class="penny-chip">See weekly review →</div>
+            </div>
+
+            <div class="phone-tx">
+              <div class="tx-left">
+                <div class="tx-icon">🛒</div>
+                <div>
+                  <div class="tx-name">Loblaws</div>
+                  <div class="tx-cat">Groceries</div>
+                </div>
+              </div>
+              <div class="tx-amt">−$94.20</div>
+            </div>
+            <div class="phone-tx">
+              <div class="tx-left">
+                <div class="tx-icon">🍜</div>
+                <div>
+                  <div class="tx-name">Momofuku</div>
+                  <div class="tx-cat">Dining</div>
+                </div>
+              </div>
+              <div class="tx-amt">−$67.00</div>
+            </div>
+            <div class="phone-tx">
+              <div class="tx-left">
+                <div class="tx-icon">🚇</div>
+                <div>
+                  <div class="tx-name">TTC Presto</div>
+                  <div class="tx-cat">Transit</div>
+                </div>
+              </div>
+              <div class="tx-amt">−$13.75</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <ul class="phone-desc-list">
+          <li class="phone-desc-item fade-up">
+            <div class="phone-desc-icon">🎯</div>
+            <div>
+              <div class="phone-desc-title">What people told me</div>
+              <div class="phone-desc-body">"I check my balance and still don't know if I'm okay." "Budgeting apps feel like homework I never do." "I only realize I overspent when it's already too late."</div>
+            </div>
+          </li>
+          <li class="phone-desc-item fade-up">
+            <div class="phone-desc-icon">💡</div>
+            <div>
+              <div class="phone-desc-title">What they actually wanted</div>
+              <div class="phone-desc-body">Not more data. Less noise. They wanted someone to just tell them if they were fine. In plain words. Without making them feel judged.</div>
+            </div>
+          </li>
+          <li class="phone-desc-item fade-up">
+            <div class="phone-desc-icon">🔒</div>
+            <div>
+              <div class="phone-desc-title">The trust thing</div>
+              <div class="phone-desc-body">Every single person mentioned trust unprompted. They'd use AI for their money, but only if they could understand why it was saying what it was saying. That became the north star.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 AI FEATURE -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">04 Penny Intelligence</div>
+    <h2 class="section-title fade-up">The hardest part wasn't the AI.<br><em>It was earning the right to use it.</em></h2>
+    <p class="section-body fade-up">I spent more time designing trust than I did designing features. Before Penny could tell someone their dining spend is too high, it had to prove it was worth listening to. Every principle below came from that question: how do we earn it?</p>
+
+    <div class="principles-grid">
+      <div class="principle-card fade-up">
+        <div class="principle-name">Transparency</div>
+        <div class="principle-decision">Penny always shows its receipts: which transactions triggered the insight</div>
+        <div class="principle-why">People said they'd distrust advice they couldn't verify. So I made the reasoning visible every time.</div>
+      </div>
+      <div class="principle-card fade-up">
+        <div class="principle-name">Optionality</div>
+        <div class="principle-decision">One tap to dismiss anything. Always.</div>
+        <div class="principle-why">Penny has opinions, but it never traps you. The moment it feels like a nag, people stop listening.</div>
+      </div>
+      <div class="principle-card fade-up">
+        <div class="principle-name">Plain English</div>
+        <div class="principle-decision">No financial jargon. Ever. If a 12-year-old couldn't understand it, we rewrote it.</div>
+        <div class="principle-why">Tested copy across 3 different financial literacy levels. Simpler always won.</div>
+      </div>
+      <div class="principle-card fade-up">
+        <div class="principle-name">Timing</div>
+        <div class="principle-decision">Penny speaks after transactions or weekly. Never mid-task.</div>
+        <div class="principle-why">Interrupting someone mid-payment to comment on their spending? That's how you get uninstalled.</div>
+      </div>
+      <div class="principle-card fade-up">
+        <div class="principle-name">Calibration</div>
+        <div class="principle-decision">You set Penny's sensitivity during setup, not buried in settings</div>
+        <div class="principle-why">People trust AI more when they feel like they chose it. This was one of the clearest insights from testing.</div>
+      </div>
+      <div class="principle-card fade-up">
+        <div class="principle-name">Ambient Position</div>
+        <div class="principle-decision">Penny lives below the fold. Present, but not in charge.</div>
+        <div class="principle-why">It's your money, your app. Penny is a guest, not the host.</div>
+      </div>
+    </div>
+
+    <div class="quote-block fade-up">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">The AI can't be smarter than the user's trust in it. I kept coming back to that. Before Penny could give advice, it had to earn the right, one small, honest interaction at a time.</div>
+      <div class="quote-attr">Design rationale, Penny project</div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 FLOWS -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">05 Prototype Flows</div>
+    <h2 class="section-title fade-up">Three flows.<br><em>Each one a different kind of trust moment.</em></h2>
+    <p class="section-body fade-up">I designed in reverse, starting with the moments that mattered most to users, then working backwards to how they'd get there. Every flow is about earning a little more trust than the last.</p>
+
+    <div class="flows-grid">
+      <div class="flow-card fade-up">
+        <div class="flow-num">01</div>
+        <div>
+          <div class="flow-tag onboarding">Onboarding</div>
+          <div class="flow-title">The setup that earns permission</div>
+          <div class="flow-meta">12 screens · Target: 3.2 min · Drop-off target: &lt;18% at step 4</div>
+          <div class="flow-body">Most onboarding treats AI like a feature you unlock. I treated it like a conversation you have. Before Penny gets any access, it explains what it's going to do, and lets you decide how much of it you want.</div>
+          <ul class="flow-highlights">
+            <li>The sensitivity slider ('Just show me data' → 'Keep me ahead') was the most-loved screen in testing. People felt like they were in control before they'd even started</li>
+            <li>First insight appears immediately after account linking. Not a promise of future value. Actual value, now.</li>
+            <li>Face ID and OAuth before passwords, which reduces friction at the moments people most want to give up</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card fade-up">
+        <div class="flow-num">02</div>
+        <div>
+          <div class="flow-tag weekly">Weekly Review: Hero Flow</div>
+          <div class="flow-title">Your week in under 90 seconds</div>
+          <div class="flow-meta">7 screens · Target: &lt;90 sec · The flow I'm most proud of</div>
+          <div class="flow-body">Every Sunday evening, Penny gives you a card-by-card digest of your week: what went well, what to watch, one thing to do. It's designed to feel like a quick chat with a friend, not a performance review of your spending habits.</div>
+          <ul class="flow-highlights">
+            <li>Card swipe with velocity tracking. If you swipe fast, it knows you're just moving through; slow down and it pauses</li>
+            <li>Weekly, not daily. People in research said daily money check-ins gave them anxiety; Sunday felt natural</li>
+            <li>The completion animation is 1.2 seconds of confetti. Subtle. Earnable. People loved it in testing.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow-card fade-up">
+        <div class="flow-num">03</div>
+        <div>
+          <div class="flow-tag anomaly">Spend Anomaly</div>
+          <div class="flow-title">The alert that doesn't feel like an alert</div>
+          <div class="flow-meta">7 screens · Target: &lt;45 sec · The highest-stakes trust moment</div>
+          <div class="flow-body">When you've spent 1.3× more than usual on something, Penny surfaces a card. Not a push notification, not a red badge. An amber card, calm language, and three options: understand it, set a soft limit, or dismiss. That's it.</div>
+          <ul class="flow-highlights">
+            <li>Amber, not red. The colour alone changed how people described the feature in testing. Red felt like an accusation. Amber felt like a heads-up.</li>
+            <li>'Explain more' opens a conversational view where Penny talks you through it in plain English, not a chart</li>
+            <li>Once dismissed, the anomaly card disappears from home completely. No residual anxiety.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 DECISIONS -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">06 Design Decisions</div>
+    <h2 class="section-title fade-up">The decisions that<br><em>weren't obvious.</em></h2>
+
+    <div class="decisions-list fade-up">
+      <div class="decision-row">
+        <div class="decision-cell">What I chose</div>
+        <div class="decision-cell">What I almost did instead</div>
+        <div class="decision-cell">Why I went this way</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-cell"><strong>Cards on the home screen, not push alerts</strong></div>
+        <div class="decision-cell">Real-time push notifications for spending anomalies</div>
+        <div class="decision-cell">In research, people described bank push notifications as either ignored or alarming. Never useful. A card on the home screen waits for the user, not the other way around.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-cell"><strong>Sensitivity slider in onboarding, not settings</strong></div>
+        <div class="decision-cell">Full AI on by default, with an off switch buried in settings</div>
+        <div class="decision-cell">People engage more with AI they chose than AI they tolerate. Surfacing the slider in onboarding made it a feature, not a disclaimer.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-cell"><strong>Sunday weekly digest only</strong></div>
+        <div class="decision-cell">Daily spending summaries</div>
+        <div class="decision-cell">Daily money check-ins created anxiety in every person I talked to. Weekly matched how people actually think about their finances: in week-sized chunks, not day-sized ones.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-cell"><strong>Show the transactions that triggered the insight</strong></div>
+        <div class="decision-cell">Just show the conclusion ("you spent more on dining")</div>
+        <div class="decision-cell">People said they'd dismiss anything they couldn't verify. Showing your work isn't just good ethics. It's good UX.</div>
+      </div>
+      <div class="decision-row">
+        <div class="decision-cell"><strong>One sentence of plain text over a chart</strong></div>
+        <div class="decision-cell">Mini data visualizations for every AI insight</div>
+        <div class="decision-cell">For the 30–40 age group I was designing for, a clear sentence beat a graph they had to interpret every single time in testing.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 OUTCOMES -->
+<section>
+  <div class="container">
+    <div class="section-tag fade-up">07 Outcomes</div>
+    <h2 class="section-title fade-up">What the testing<br><em>actually showed.</em></h2>
+
+    <div class="outcomes-grid">
+      <div class="outcome-card fade-up">
+        <div class="outcome-number">62%</div>
+        <div class="outcome-label">faster for people to understand their monthly spending<br><span style="font-size:12px; color: var(--text-dim)">usability test, n=5</span></div>
+      </div>
+      <div class="outcome-card fade-up">
+        <div class="outcome-number">4.4/5</div>
+        <div class="outcome-label">trust score for Penny's AI, from people who started skeptical<br><span style="font-size:12px; color: var(--text-dim)">post-prototype survey</span></div>
+      </div>
+      <div class="outcome-card fade-up">
+        <div class="outcome-number">100%</div>
+        <div class="outcome-label">finished the weekly review in under 90 seconds<br><span style="font-size:12px; color: var(--text-dim)">all 5 testers</span></div>
+      </div>
+      <div class="outcome-card fade-up">
+        <div class="outcome-number">0</div>
+        <div class="outcome-label">people used the words "pushy," "annoying," or "scary" about Penny<br><span style="font-size:12px; color: var(--text-dim)">the metric I cared most about</span></div>
+      </div>
+    </div>
+
+    <div class="learnings-two-col">
+      <div class="learning-block fade-up">
+        <h4>If I had another month</h4>
+        <ul class="learning-list">
+          <li>Android version, because the trust patterns I found probably look different on Material You</li>
+          <li>A/B test: one sentence of text vs. a mini sparkline for anomaly cards</li>
+          <li>Design for the stressful moments (job loss, unexpected bills), not just steady-state users</li>
+          <li>Run a full VoiceOver walkthrough with a blind tester. The accessibility annotations are there, but they haven't been tested with a real user yet</li>
+        </ul>
+      </div>
+      <div class="learning-block fade-up">
+        <h4>What I'd take to any fintech team</h4>
+        <ul class="learning-list">
+          <li>Design the trust layer before the feature layer. Every time.</li>
+          <li>Mobile interaction design is physics, not just pixels. Get the spring curves right.</li>
+          <li>Using AI in your process isn't cheating. It's just faster affinity mapping.</li>
+          <li>The best AI UX is the one that disappears. If people notice it, something's wrong.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-badge">
+      <span class="cta-badge-dot"></span>
+      Available for work · Toronto · Hybrid or Remote
+    </div>
+    <h2 class="cta-title fade-up">Want to see<br>where this is going?</h2>
+    <p class="cta-body fade-up">The Figma file is being built out now. I'd love to walk through the flows live, talk through the decisions, or just have a conversation about designing AI that people actually trust.</p>
+    <div class="cta-links fade-up">
+      <a class="cta-btn primary" href="/cdn-cgi/l/email-protection#2d4c4a4c5f5a4c41034c435e4544464c1c1d146d4a404c4441034e4240">Get in touch →</a>
+      <a class="cta-btn ghost" href="https://www.linkedin.com/in/anshika-agarwall/" target="_blank">LinkedIn</a>
+      <a class="cta-btn ghost" href="https://anshika1009.framer.website/" target="_blank">Back to portfolio</a>
+    </div>
+  </div>
+</section>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Intersection Observer for fade-up animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // stagger siblings
+        const siblings = entry.target.parentElement.querySelectorAll('.fade-up');
+        let delay = 0;
+        siblings.forEach((el, idx) => {
+          if (el === entry.target) delay = idx * 80;
+        });
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, Math.min(delay, 300));
+        observer.unobserve(entry.target);
+      }
+    });
+  },
